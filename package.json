@@ -1,8 +1,8 @@
 {
-  "author": "Martin Kavík <martin@kavik.cz>",
-  "name": "seed-quickstart-webpack",
-  "version": "0.7.5",
-  "repository": "https://github.com/MartinKavik/seed-quickstart-webpack",
+  "author": "Oliver Downard <olivermd@btinternet.com>",
+  "name": "seed-todo-app",
+  "version": "0.1.0",
+  "repository": "https://github.com/olivermd/seed-todo-app",
   "license": "MIT",
   "scripts": {
     "start": "yarn generate:css_classes && webpack-dev-server --config webpack.config.js -d",

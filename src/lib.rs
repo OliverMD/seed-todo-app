@@ -10,18 +10,13 @@
 )]
 
 mod generated;
-mod page;
 
 use fixed_vec_deque::FixedVecDeque;
 use generated::css_classes::C;
 use seed::{prelude::*, *};
 use Visibility::*;
 
-const TITLE_SUFFIX: &str = "Kavik.cz";
-// https://mailtolink.me/
-const MAIL_TO_KAVIK: &str = "mailto:martin@kavik.cz?subject=Something%20for%20Martin&body=Hi!%0A%0AI%20am%20Groot.%20I%20like%20trains.";
-const MAIL_TO_HELLWEB: &str =
-    "mailto:martin@hellweb.app?subject=Hellweb%20-%20pain&body=Hi!%0A%0AI%20hate";
+const TITLE_SUFFIX: &str = "TODO";
 const USER_AGENT_FOR_PRERENDERING: &str = "ReactSnap";
 const STATIC_PATH: &str = "static";
 const IMAGES_PATH: &str = "static/images";
@@ -33,10 +28,6 @@ const ABOUT: &str = "about";
 // ------ ------
 
 fn init(url: Url, orders: &mut impl Orders<Msg>) -> Model {
-    orders
-        .subscribe(Msg::UrlChanged)
-        .stream(streams::window_event(Ev::Scroll, |_| Msg::Scrolled));
-
     Model {
         base_url: url.to_base_url(),
         page: Page::init(url),
@@ -125,38 +116,9 @@ impl<'a> Urls<'a> {
 // ------ ------
 
 pub enum Msg {
-    UrlChanged(subs::UrlChanged),
-    ScrollToTop,
-    Scrolled,
-    ToggleMenu,
-    HideMenu,
 }
 
 pub fn update(msg: Msg, model: &mut Model, _: &mut impl Orders<Msg>) {
-    match msg {
-        Msg::UrlChanged(subs::UrlChanged(url)) => {
-            model.page = Page::init(url);
-        },
-        Msg::ScrollToTop => window().scroll_to_with_scroll_to_options(
-            web_sys::ScrollToOptions::new().top(0.),
-        ),
-        Msg::Scrolled => {
-            // Some browsers use `document.body.scrollTop`
-            // and other ones `document.documentElement.scrollTop`.
-            let mut position = body().scroll_top();
-            if position == 0 {
-                position = document()
-                    .document_element()
-                    .expect("get document element")
-                    .scroll_top()
-            }
-            *model.scroll_history.push_back() = position;
-        },
-        Msg::ToggleMenu => model.menu_visibility.toggle(),
-        Msg::HideMenu => {
-            model.menu_visibility = Hidden;
-        },
-    }
 }
 
 // ------ ------
@@ -178,13 +140,6 @@ pub fn view(model: &Model) -> impl IntoNodes<Msg> {
             C.flex,
             C.flex_col,
         ],
-        match model.page {
-            Page::Home => page::home::view(&model.base_url),
-            Page::About => page::about::view(),
-            Page::NotFound => page::not_found::view(),
-        },
-        page::partial::header::view(model),
-        page::partial::footer::view(),
     ]
 }
 

@@ -262,16 +262,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "kavik_cz"
-version = "0.1.0"
-dependencies = [
- "fixed-vec-deque",
- "seed",
- "wasm-bindgen-test",
- "web-sys",
-]
-
-[[package]]
 name = "lazy_static"
 version = "1.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -484,6 +474,16 @@ dependencies = [
  "version_check 0.9.2",
  "wasm-bindgen",
  "wasm-bindgen-futures",
+ "web-sys",
+]
+
+[[package]]
+name = "seed-todo-app"
+version = "0.1.0"
+dependencies = [
+ "fixed-vec-deque",
+ "seed",
+ "wasm-bindgen-test",
  "web-sys",
 ]
 

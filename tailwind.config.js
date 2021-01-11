@@ -29,20 +29,16 @@ module.exports = {
       // => @media (min-width: 1701px) { ... }
     },
     fontFamily: {
-      display: ['Metropolis', 'sans-serif'],
+      display: ['Josefin', 'sans-serif'],
       body: ['Inter', 'sans-serif'],
       monospace: ['Courier New', 'monospace'],
       ordinary: ['Arial', 'sans-serif'],
       sans: ['-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial',
           'Noto Sans', 'sans-serif', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji']
     },
-    fontSize: (() => {
-      return Object.fromEntries([
-        ...range(15, 35, 1),
-        ...range(40, 60, 5),
-        ...range(70, 120, 10)
-      ].map(i => [i, `${i}px`]))
-    })(),
+    letterSpacing: {
+      widest: '.5em'
+    },
     colors: {
         black: "#000",
         light: {

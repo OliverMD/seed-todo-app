@@ -115,11 +115,9 @@ impl<'a> Urls<'a> {
 //    Update
 // ------ ------
 
-pub enum Msg {
-}
+pub enum Msg {}
 
-pub fn update(msg: Msg, model: &mut Model, _: &mut impl Orders<Msg>) {
-}
+pub fn update(msg: Msg, model: &mut Model, _: &mut impl Orders<Msg>) {}
 
 // ------ ------
 //     View
@@ -134,12 +132,12 @@ pub fn update(msg: Msg, model: &mut Model, _: &mut impl Orders<Msg>) {
 
 pub fn view(model: &Model) -> impl IntoNodes<Msg> {
     div![
-        C![
-            IF!(not(model.in_prerendering) => C.fade_in),
-            C.min_h_screen,
-            C.flex,
-            C.flex_col,
+        C![C.justify_center, C.items_center, C.flex],
+        div![
+            C![C.absolute, C.w_screen, C.h_full, C.top_0],
+            img![attrs! { At::Src => image_src("bg-desktop-light.jpg")}]
         ],
+        div![C![C.px_56, C.mt_32, C.container, C.z_10], header_view(),],
     ]
 }
 
@@ -147,8 +145,33 @@ pub fn image_src(image: &str) -> String {
     format!("{}/{}", IMAGES_PATH, image)
 }
 
+pub fn image_src_url(image: &str) -> String {
+    format!("url({}/{})", IMAGES_PATH, image)
+}
+
 pub fn asset_path(asset: &str) -> String {
     format!("{}/{}", STATIC_PATH, asset)
+}
+
+fn header_view() -> Node<Msg> {
+    div![
+        C![C.relative, C.flex, C.flex_row],
+        h1![
+            C![
+                C.flex_1,
+                C.font_display,
+                C.text_light_1,
+                C.font_bold,
+                C.tracking_widest,
+                C.text_4xl
+            ],
+            "TODO"
+        ],
+        div![
+            C![C.self_center],
+            img![C![], attrs! {At::Src => image_src("icon-moon.svg")}]
+        ]
+    ]
 }
 
 // ------ ------

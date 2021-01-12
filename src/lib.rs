@@ -137,7 +137,11 @@ pub fn view(model: &Model) -> impl IntoNodes<Msg> {
             C![C.absolute, C.w_screen, C.h_full, C.top_0],
             img![attrs! { At::Src => image_src("bg-desktop-light.jpg")}]
         ],
-        div![C![C.px_56, C.mt_32, C.container, C.z_10], header_view(),],
+        div![
+            C![C.px_56, C.mt_16, C.container, C.z_10],
+            header_view(),
+            new_todo_view()
+        ],
     ]
 }
 
@@ -155,7 +159,7 @@ pub fn asset_path(asset: &str) -> String {
 
 fn header_view() -> Node<Msg> {
     div![
-        C![C.relative, C.flex, C.flex_row],
+        C![C.relative, C.flex, C.flex_row, C.mb_12],
         h1![
             C![
                 C.flex_1,
@@ -163,13 +167,32 @@ fn header_view() -> Node<Msg> {
                 C.text_light_1,
                 C.font_bold,
                 C.tracking_widest,
-                C.text_4xl
+                C.text_4xl,
             ],
             "TODO"
         ],
         div![
             C![C.self_center],
             img![C![], attrs! {At::Src => image_src("icon-moon.svg")}]
+        ]
+    ]
+}
+
+fn new_todo_view() -> Node<Msg> {
+    div![
+        C![C.rounded_md, C.bg_light_1, C.w_full, C.p_5, C.flex],
+        div![C![
+            C.rounded_full,
+            C.justify_center,
+            C.h_6,
+            C.w_6,
+            C.flex,
+            C.border_light_3,
+            C.border_2
+        ]],
+        div![
+            C![C.ml_4, C.font_display, C.text_light_4],
+            "Create a new todo..."
         ]
     ]
 }

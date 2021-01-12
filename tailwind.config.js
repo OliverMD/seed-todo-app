@@ -29,8 +29,7 @@ module.exports = {
       // => @media (min-width: 1701px) { ... }
     },
     fontFamily: {
-      display: ['Josefin', 'sans-serif'],
-      body: ['Inter', 'sans-serif'],
+      display: ['Josefin Sans', 'sans-serif'],
       monospace: ['Courier New', 'monospace'],
       ordinary: ['Arial', 'sans-serif'],
       sans: ['-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial',

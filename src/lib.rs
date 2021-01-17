@@ -11,37 +11,30 @@
 
 mod generated;
 
-use fixed_vec_deque::FixedVecDeque;
 use generated::css_classes::C;
 use seed::{prelude::*, *};
 use Visibility::*;
 
 const TITLE_SUFFIX: &str = "TODO";
-const USER_AGENT_FOR_PRERENDERING: &str = "ReactSnap";
 const STATIC_PATH: &str = "static";
 const IMAGES_PATH: &str = "static/images";
 
 const ABOUT: &str = "about";
 
+const ENTER_KEY: &str = "Enter";
+
 // ------ ------
 //     Init
 // ------ ------
 
-fn init(url: Url, orders: &mut impl Orders<Msg>) -> Model {
+fn init(_url: Url, _orders: &mut impl Orders<Msg>) -> Model {
     Model {
-        base_url: url.to_base_url(),
-        page: Page::init(url),
-        scroll_history: ScrollHistory::new(),
-        menu_visibility: Hidden,
-        in_prerendering: is_in_prerendering(),
+        new_todo: String::new(),
+        todos: vec![
+            String::from("Pick up groceries"),
+            String::from("10 minutes meditation"),
+        ],
     }
-}
-
-fn is_in_prerendering() -> bool {
-    let user_agent =
-        window().navigator().user_agent().expect("cannot get user agent");
-
-    user_agent == USER_AGENT_FOR_PRERENDERING
 }
 
 // ------ ------
@@ -63,16 +56,9 @@ impl Visibility {
     }
 }
 
-// We need at least 3 last values to detect scroll direction,
-// because neighboring ones are sometimes equal.
-type ScrollHistory = FixedVecDeque<[i32; 3]>;
-
 pub struct Model {
-    pub base_url: Url,
-    pub page: Page,
-    pub scroll_history: ScrollHistory,
-    pub menu_visibility: Visibility,
-    pub in_prerendering: bool,
+    new_todo: String,
+    todos: Vec<String>,
 }
 
 // ------ Page ------
@@ -115,9 +101,22 @@ impl<'a> Urls<'a> {
 //    Update
 // ------ ------
 
-pub enum Msg {}
+pub enum Msg {
+    NewTodoChanged(String),
+    CreateTodo,
+}
 
-pub fn update(msg: Msg, model: &mut Model, _: &mut impl Orders<Msg>) {}
+pub fn update(msg: Msg, model: &mut Model, _: &mut impl Orders<Msg>) {
+    match msg {
+        Msg::NewTodoChanged(new_todo) => {
+            model.new_todo = new_todo;
+        }
+        Msg::CreateTodo => {
+            model.todos.push(model.new_todo.to_owned());
+            model.new_todo = String::new();
+        }
+    }
+}
 
 // ------ ------
 //     View
@@ -140,7 +139,8 @@ pub fn view(model: &Model) -> impl IntoNodes<Msg> {
         div![
             C![C.px_56, C.mt_16, C.container, C.z_10],
             header_view(),
-            new_todo_view()
+            new_todo_view(&model.new_todo),
+            todo_list_view(&model.todos)
         ],
     ]
 }
@@ -178,21 +178,85 @@ fn header_view() -> Node<Msg> {
     ]
 }
 
-fn new_todo_view() -> Node<Msg> {
+fn new_todo_view(new_todo: &str) -> Node<Msg> {
     div![
-        C![C.rounded_md, C.bg_light_1, C.w_full, C.p_5, C.flex],
+        C![C.rounded_md, C.bg_light_6, C.w_full, C.p_5, C.flex],
         div![C![
             C.rounded_full,
             C.justify_center,
             C.h_6,
             C.w_6,
             C.flex,
-            C.border_light_3,
+            C.border_light_2,
             C.border_2
         ]],
+        input![
+            C![
+                C.ml_4,
+                C.font_display,
+                C.text_light_4,
+                C.bg_light_6,
+                C.w_full,
+                C.text_base
+            ],
+            attrs! {
+                At::Placeholder => "Create a new todo...",
+                At::AutoFocus => AtValue::None,
+                At::Value => new_todo
+            },
+            input_ev(Ev::Input, Msg::NewTodoChanged),
+            keyboard_ev(
+                Ev::KeyDown,
+                |event| IF!(event.key() == ENTER_KEY => Msg::CreateTodo)
+            )
+        ]
+    ]
+}
+
+fn todo_list_view(todos: &Vec<String>) -> Node<Msg> {
+    div![
+        C![
+            C.mt_8,
+            C.flex,
+            C.rounded_md,
+            C.bg_light_6,
+            C.w_full,
+            C.shadow,
+            C.flex_col,
+            C.divide_y,
+            C.divide_light_3
+        ],
+        ul![
+            C![C.flex, C.w_full, C.divide_y, C.divide_light_3, C.flex_col],
+            todos.iter().enumerate().map(|(idx, todo)| {
+                li![
+                    el_key(&idx),
+                    div![
+                        C![
+                            C.p_5,
+                            C.flex,
+                            C.w_full,
+                            C.font_display,
+                            C.text_light_5,
+                            C.border_light_4
+                        ],
+                        div![C![
+                            C.rounded_full,
+                            C.justify_center,
+                            C.h_6,
+                            C.w_6,
+                            C.flex,
+                            C.border_light_2,
+                            C.border_2
+                        ]],
+                        div![C![C.ml_4, C.text_base], todo]
+                    ]
+                ]
+            })
+        ],
         div![
-            C![C.ml_4, C.font_display, C.text_light_4],
-            "Create a new todo..."
+            C![C.flex, C.font_display, C.p_5, C.text_light_3],
+            format!("{} items left", todos.len())
         ]
     ]
 }

@@ -28,6 +28,10 @@ module.exports = {
       'xl': '1701px',
       // => @media (min-width: 1701px) { ... }
     },
+    fontSize: {
+      'base': '18px',
+      '4xl': '2.25rem'
+    },
     fontFamily: {
       display: ['Josefin Sans', 'sans-serif'],
       monospace: ['Courier New', 'monospace'],
@@ -46,6 +50,7 @@ module.exports = {
             3: 'hsl(233, 11%, 84%)',
             4: 'hsl(236, 9%, 61%)',
             5: 'hsl(235, 19%, 35%)',
+            6: 'hsl(256, 100%, 100%)',
         },
         dark: {
             1: 'hsl(235, 21%, 11%)',

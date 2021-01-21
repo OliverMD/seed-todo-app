@@ -255,8 +255,29 @@ fn todo_list_view(todos: &Vec<String>) -> Node<Msg> {
             })
         ],
         div![
-            C![C.flex, C.font_display, C.p_5, C.text_light_3],
-            format!("{} items left", todos.len())
+            C![
+                C.flex,
+                C.flex_row,
+                C.font_display,
+                C.p_5,
+                C.text_light_3,
+                C.text_sm
+            ],
+            div![C![C.flex_auto], format!("{} items left", todos.len())],
+            div![
+                C![
+                    C.flex_auto,
+                    C.flex,
+                    C.justify_center,
+                    C.space_x_5,
+                    C.font_display,
+                    C.font_bold
+                ],
+                div![C![C.text_blue], "All"],
+                div!["Active"],
+                div!["Completed"]
+            ],
+            div![C![C.flex_auto, C.flex, C.justify_end], "Clear Completed"]
         ]
     ]
 }

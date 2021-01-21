@@ -29,6 +29,7 @@ module.exports = {
       // => @media (min-width: 1701px) { ... }
     },
     fontSize: {
+      'sm': '.875rem',
       'base': '18px',
       '4xl': '2.25rem'
     },
@@ -44,6 +45,7 @@ module.exports = {
     },
     colors: {
         black: "#000",
+        blue: "#4299e1",
         light: {
             1: 'hsl(0, 0%, 98%)',
             2: 'hsl(236, 33%, 92%)',

@@ -140,7 +140,18 @@ pub fn view(model: &Model) -> impl IntoNodes<Msg> {
             C![C.px_56, C.mt_16, C.container, C.z_10],
             header_view(),
             new_todo_view(&model.new_todo),
-            todo_list_view(&model.todos)
+            todo_list_view(&model.todos),
+            div![
+                C![
+                    C.font_display,
+                    C.flex,
+                    C.justify_center,
+                    C.text_light_3,
+                    C.mt_16,
+                    C.text_sm
+                ],
+                "Drag and drop to reorder list"
+            ]
         ],
     ]
 }
@@ -252,7 +263,40 @@ fn todo_list_view(todos: &Vec<String>) -> Node<Msg> {
                         div![C![C.ml_4, C.text_base], todo]
                     ]
                 ]
-            })
+            }),
+            li![
+                el_key(&10101),
+                div![
+                    C![
+                        C.p_5,
+                        C.flex,
+                        C.w_full,
+                        C.font_display,
+                        C.text_light_3,
+                        C.border_light_4
+                    ],
+                    div![
+                        C![
+                            C.rounded_full,
+                            C.justify_center,
+                            C.h_6,
+                            C.w_6,
+                            C.flex,
+                            C.bg_gradient_to_r,
+                            C.from_light_5,
+                            C.to_blue
+                        ],
+                        img![
+                            C![C.w_3, C.h_3, C.flex, C.self_center],
+                            attrs! {At::Src => image_src("icon-check.svg")}
+                        ]
+                    ],
+                    div![
+                        C![C.ml_4, C.text_base, C.line_through],
+                        "Test Todo value"
+                    ]
+                ]
+            ]
         ],
         div![
             C![

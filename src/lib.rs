@@ -13,6 +13,7 @@ mod generated;
 
 use generated::css_classes::C;
 use seed::{prelude::*, *};
+use ulid::Ulid;
 use Visibility::*;
 
 const TITLE_SUFFIX: &str = "TODO";
@@ -31,8 +32,9 @@ fn init(_url: Url, _orders: &mut impl Orders<Msg>) -> Model {
     Model {
         new_todo: String::new(),
         todos: vec![
-            String::from("Pick up groceries"),
-            String::from("10 minutes meditation"),
+            Todo::new(String::from("Pick up groceries")),
+            Todo::new(String::from("10 minutes meditation")),
+            Todo::new_completed(String::from("This is a completed todo")),
         ],
     }
 }
@@ -56,9 +58,33 @@ impl Visibility {
     }
 }
 
+struct Todo {
+    id: Ulid,
+    content: String,
+    is_complete: bool,
+}
+
+impl Todo {
+    fn new(content: String) -> Self {
+        Todo {
+            id: Ulid::new(),
+            content,
+            is_complete: false,
+        }
+    }
+
+    fn new_completed(content: String) -> Self {
+        Todo {
+            id: Ulid::new(),
+            content,
+            is_complete: true,
+        }
+    }
+}
+
 pub struct Model {
     new_todo: String,
-    todos: Vec<String>,
+    todos: Vec<Todo>,
 }
 
 // ------ Page ------
@@ -112,7 +138,7 @@ pub fn update(msg: Msg, model: &mut Model, _: &mut impl Orders<Msg>) {
             model.new_todo = new_todo;
         }
         Msg::CreateTodo => {
-            model.todos.push(model.new_todo.to_owned());
+            model.todos.push(Todo::new(model.new_todo.to_owned()));
             model.new_todo = String::new();
         }
     }
@@ -208,7 +234,8 @@ fn new_todo_view(new_todo: &str) -> Node<Msg> {
                 C.text_light_4,
                 C.bg_light_6,
                 C.w_full,
-                C.text_base
+                C.text_base,
+                C.focus__outline_none
             ],
             attrs! {
                 At::Placeholder => "Create a new todo...",
@@ -224,7 +251,64 @@ fn new_todo_view(new_todo: &str) -> Node<Msg> {
     ]
 }
 
-fn todo_list_view(todos: &Vec<String>) -> Node<Msg> {
+fn todo_view(todo: &Todo) -> Node<Msg> {
+    if todo.is_complete {
+        li![
+            el_key(&todo.id),
+            C![
+                C.p_5,
+                C.flex,
+                C.w_full,
+                C.font_display,
+                C.text_light_3,
+                C.border_light_4
+            ],
+            div![
+                C![
+                    C.rounded_full,
+                    C.justify_center,
+                    C.h_6,
+                    C.w_6,
+                    C.flex,
+                    C.bg_gradient_to_r,
+                    C.from_light_5,
+                    C.to_blue
+                ],
+                img![
+                    C![C.w_3, C.h_3, C.flex, C.self_center],
+                    attrs! {At::Src => image_src("icon-check.svg")}
+                ]
+            ],
+            div![C![C.ml_4, C.text_base, C.line_through], &todo.content]
+        ]
+    } else {
+        li![
+            el_key(&todo.id),
+            div![
+                C![
+                    C.p_5,
+                    C.flex,
+                    C.w_full,
+                    C.font_display,
+                    C.text_light_5,
+                    C.border_light_4
+                ],
+                div![C![
+                    C.rounded_full,
+                    C.justify_center,
+                    C.h_6,
+                    C.w_6,
+                    C.flex,
+                    C.border_light_2,
+                    C.border_2
+                ]],
+                div![C![C.ml_4, C.text_base], &todo.content]
+            ]
+        ]
+    }
+}
+
+fn todo_list_view(todos: &Vec<Todo>) -> Node<Msg> {
     div![
         C![
             C.mt_8,
@@ -239,64 +323,7 @@ fn todo_list_view(todos: &Vec<String>) -> Node<Msg> {
         ],
         ul![
             C![C.flex, C.w_full, C.divide_y, C.divide_light_3, C.flex_col],
-            todos.iter().enumerate().map(|(idx, todo)| {
-                li![
-                    el_key(&idx),
-                    div![
-                        C![
-                            C.p_5,
-                            C.flex,
-                            C.w_full,
-                            C.font_display,
-                            C.text_light_5,
-                            C.border_light_4
-                        ],
-                        div![C![
-                            C.rounded_full,
-                            C.justify_center,
-                            C.h_6,
-                            C.w_6,
-                            C.flex,
-                            C.border_light_2,
-                            C.border_2
-                        ]],
-                        div![C![C.ml_4, C.text_base], todo]
-                    ]
-                ]
-            }),
-            li![
-                el_key(&10101),
-                div![
-                    C![
-                        C.p_5,
-                        C.flex,
-                        C.w_full,
-                        C.font_display,
-                        C.text_light_3,
-                        C.border_light_4
-                    ],
-                    div![
-                        C![
-                            C.rounded_full,
-                            C.justify_center,
-                            C.h_6,
-                            C.w_6,
-                            C.flex,
-                            C.bg_gradient_to_r,
-                            C.from_light_5,
-                            C.to_blue
-                        ],
-                        img![
-                            C![C.w_3, C.h_3, C.flex, C.self_center],
-                            attrs! {At::Src => image_src("icon-check.svg")}
-                        ]
-                    ],
-                    div![
-                        C![C.ml_4, C.text_base, C.line_through],
-                        "Test Todo value"
-                    ]
-                ]
-            ]
+            todos.iter().map(|todo| { todo_view(&todo) }),
         ],
         div![
             C![

@@ -16,11 +16,8 @@ use seed::{prelude::*, *};
 use ulid::Ulid;
 use Visibility::*;
 
-const TITLE_SUFFIX: &str = "TODO";
 const STATIC_PATH: &str = "static";
 const IMAGES_PATH: &str = "static/images";
-
-const ABOUT: &str = "about";
 
 const ENTER_KEY: &str = "Enter";
 
@@ -85,42 +82,6 @@ impl Todo {
 pub struct Model {
     new_todo: String,
     todos: Vec<Todo>,
-}
-
-// ------ Page ------
-
-#[derive(Clone, Copy, Eq, PartialEq)]
-pub enum Page {
-    Home,
-    About,
-    NotFound,
-}
-
-impl Page {
-    pub fn init(mut url: Url) -> Self {
-        let (page, title) = match url.remaining_path_parts().as_slice() {
-            [] => (Self::Home, TITLE_SUFFIX.to_owned()),
-            [ABOUT] => (Self::About, format!("About - {}", TITLE_SUFFIX)),
-            _ => (Self::NotFound, format!("404 - {}", TITLE_SUFFIX)),
-        };
-        document().set_title(&title);
-        page
-    }
-}
-
-// ------ ------
-//     Urls
-// ------ ------
-
-struct_urls!();
-impl<'a> Urls<'a> {
-    pub fn home(self) -> Url {
-        self.base_url()
-    }
-
-    pub fn about(self) -> Url {
-        self.base_url().add_path_part(ABOUT)
-    }
 }
 
 // ------ ------

@@ -12,6 +12,7 @@
 mod generated;
 
 use generated::css_classes::C;
+use seed::prelude::wasm_bindgen::__rt::std::collections::BTreeMap;
 use seed::{prelude::*, *};
 use ulid::Ulid;
 use Visibility::*;
@@ -26,13 +27,19 @@ const ENTER_KEY: &str = "Enter";
 // ------ ------
 
 fn init(_url: Url, _orders: &mut impl Orders<Msg>) -> Model {
+    let mut initial_todos = BTreeMap::new();
+
+    initial_todos
+        .insert(Ulid::new(), Todo::new(String::from("Pick up groceries")));
+    initial_todos
+        .insert(Ulid::new(), Todo::new(String::from("10 minutes meditation")));
+    initial_todos.insert(
+        Ulid::new(),
+        Todo::new_completed(String::from("This is a completed todo")),
+    );
     Model {
         new_todo: String::new(),
-        todos: vec![
-            Todo::new(String::from("Pick up groceries")),
-            Todo::new(String::from("10 minutes meditation")),
-            Todo::new_completed(String::from("This is a completed todo")),
-        ],
+        todos: initial_todos,
     }
 }
 
@@ -56,7 +63,6 @@ impl Visibility {
 }
 
 struct Todo {
-    id: Ulid,
     content: String,
     is_complete: bool,
 }
@@ -64,7 +70,6 @@ struct Todo {
 impl Todo {
     fn new(content: String) -> Self {
         Todo {
-            id: Ulid::new(),
             content,
             is_complete: false,
         }
@@ -72,7 +77,6 @@ impl Todo {
 
     fn new_completed(content: String) -> Self {
         Todo {
-            id: Ulid::new(),
             content,
             is_complete: true,
         }
@@ -81,7 +85,7 @@ impl Todo {
 
 pub struct Model {
     new_todo: String,
-    todos: Vec<Todo>,
+    todos: BTreeMap<Ulid, Todo>,
 }
 
 // ------ ------
@@ -91,6 +95,7 @@ pub struct Model {
 pub enum Msg {
     NewTodoChanged(String),
     CreateTodo,
+    ToggleComplete(Ulid),
 }
 
 pub fn update(msg: Msg, model: &mut Model, _: &mut impl Orders<Msg>) {
@@ -99,8 +104,16 @@ pub fn update(msg: Msg, model: &mut Model, _: &mut impl Orders<Msg>) {
             model.new_todo = new_todo;
         }
         Msg::CreateTodo => {
-            model.todos.push(Todo::new(model.new_todo.to_owned()));
+            model
+                .todos
+                .insert(Ulid::new(), Todo::new(model.new_todo.to_owned()));
             model.new_todo = String::new();
+        }
+        Msg::ToggleComplete(id) => {
+            model
+                .todos
+                .entry(id)
+                .and_modify(|todo| todo.is_complete = !todo.is_complete);
         }
     }
 }
@@ -212,10 +225,11 @@ fn new_todo_view(new_todo: &str) -> Node<Msg> {
     ]
 }
 
-fn todo_view(todo: &Todo) -> Node<Msg> {
+fn todo_view(id: &Ulid, todo: &Todo) -> Node<Msg> {
+    let id = *id;
     if todo.is_complete {
         li![
-            el_key(&todo.id),
+            el_key(&id),
             C![
                 C.p_5,
                 C.flex,
@@ -238,13 +252,14 @@ fn todo_view(todo: &Todo) -> Node<Msg> {
                 img![
                     C![C.w_3, C.h_3, C.flex, C.self_center],
                     attrs! {At::Src => image_src("icon-check.svg")}
-                ]
+                ],
+                mouse_ev(Ev::Click, move |_| Msg::ToggleComplete(id))
             ],
             div![C![C.ml_4, C.text_base, C.line_through], &todo.content]
         ]
     } else {
         li![
-            el_key(&todo.id),
+            el_key(&id),
             div![
                 C![
                     C.p_5,
@@ -263,13 +278,14 @@ fn todo_view(todo: &Todo) -> Node<Msg> {
                     C.border_light_2,
                     C.border_2
                 ]],
-                div![C![C.ml_4, C.text_base], &todo.content]
+                div![C![C.ml_4, C.text_base], &todo.content],
+                mouse_ev(Ev::Click, move |_| Msg::ToggleComplete(id))
             ]
         ]
     }
 }
 
-fn todo_list_view(todos: &Vec<Todo>) -> Node<Msg> {
+fn todo_list_view(todos: &BTreeMap<Ulid, Todo>) -> Node<Msg> {
     div![
         C![
             C.mt_8,
@@ -284,7 +300,7 @@ fn todo_list_view(todos: &Vec<Todo>) -> Node<Msg> {
         ],
         ul![
             C![C.flex, C.w_full, C.divide_y, C.divide_light_3, C.flex_col],
-            todos.iter().map(|todo| { todo_view(&todo) }),
+            todos.iter().map(|(id, todo)| { todo_view(id, &todo) }),
         ],
         div![
             C![

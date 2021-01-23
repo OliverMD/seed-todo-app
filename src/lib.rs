@@ -12,8 +12,10 @@
 mod generated;
 
 use generated::css_classes::C;
-use seed::prelude::wasm_bindgen::__rt::std::collections::BTreeMap;
-use seed::{prelude::*, *};
+use seed::{
+    prelude::{wasm_bindgen::__rt::std::collections::BTreeMap, *},
+    *,
+};
 use ulid::Ulid;
 use Visibility::*;
 
@@ -26,6 +28,7 @@ const ENTER_KEY: &str = "Enter";
 //     Init
 // ------ ------
 
+#[allow(clippy::needless_pass_by_value)]
 fn init(_url: Url, _orders: &mut impl Orders<Msg>) -> Model {
     let mut initial_todos = BTreeMap::new();
 
@@ -68,15 +71,15 @@ struct Todo {
 }
 
 impl Todo {
-    fn new(content: String) -> Self {
-        Todo {
+    const fn new(content: String) -> Self {
+        Self {
             content,
             is_complete: false,
         }
     }
 
-    fn new_completed(content: String) -> Self {
-        Todo {
+    const fn new_completed(content: String) -> Self {
+        Self {
             content,
             is_complete: true,
         }
@@ -102,19 +105,19 @@ pub fn update(msg: Msg, model: &mut Model, _: &mut impl Orders<Msg>) {
     match msg {
         Msg::NewTodoChanged(new_todo) => {
             model.new_todo = new_todo;
-        }
+        },
         Msg::CreateTodo => {
             model
                 .todos
                 .insert(Ulid::new(), Todo::new(model.new_todo.to_owned()));
             model.new_todo = String::new();
-        }
+        },
         Msg::ToggleComplete(id) => {
             model
                 .todos
                 .entry(id)
                 .and_modify(|todo| todo.is_complete = !todo.is_complete);
-        }
+        },
     }
 }
 
@@ -300,7 +303,7 @@ fn todo_list_view(todos: &BTreeMap<Ulid, Todo>) -> Node<Msg> {
         ],
         ul![
             C![C.flex, C.w_full, C.divide_y, C.divide_light_3, C.flex_col],
-            todos.iter().map(|(id, todo)| { todo_view(id, &todo) }),
+            todos.iter().map(|(id, todo)| { todo_view(id, todo) }),
         ],
         div![
             C![

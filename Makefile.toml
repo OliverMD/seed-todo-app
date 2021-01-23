@@ -2,11 +2,11 @@
 
 [tasks.verify]
 description = "Format, lint with Clippy and run tests"
-dependencies = ["fmt", "clippy", "test_h_chrome"]
+dependencies = ["fmt", "clippy"]
 
 [tasks.verify_only]
 description = "Like `verify`, but fails if the code isn't formatted. Primarily for CI."
-dependencies = ["fmt_check", "clippy", "test_h_chrome"]
+dependencies = ["fmt_check", "clippy"]
 
 # ---- TEST ----
 
